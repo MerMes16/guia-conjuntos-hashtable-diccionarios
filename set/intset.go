@@ -79,7 +79,7 @@ func (s *IntSet) Difference(other *IntSet) *IntSet {
 func (s *IntSet) SymmetricDifference(other *IntSet) *IntSet {
 	set1 := s.Union(other)        // O(n)
 	set2 := s.Intersection(other) // O(n)
-	return set1.Difference(set2)  // O(n)
+	return set1.Difference(set2)  // O(n^2)
 }
 
 // Un conjunto A es igual a un conjunto B si ambos conjuntos tienen los mismos
