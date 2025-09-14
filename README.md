@@ -2,11 +2,11 @@
 
 ## Conjuntos
 
-1. [x] Implementar la operaciones `Union`, `Intersection`, `Difference`, `SymmetricDifference`, `Equal`, `Subset` y `Superset` para el conjunto de enteros dado como ejemplo ([`set/intset.go`](set/intset.go)).
-2. [x] Implementar un conjunto genérico que permita almacenar cualquier tipo de dato ([`set/set.go`](set/set.go)).
-3. [x] Implementar un conjunto basado en arreglos dinámicos (_slices_). Implementar tantos las operaciones sobre elementos como las operaciones entre conjuntos ([`set/sliceset.go`](set/sliceset.go)).
-4. [x] Implementar un conjunto basado en listas enlazadas. Implementar tantos las operaciones sobre elementos como las operaciones entre conjuntos ([`set/listset.go`](set/listset.go)).
-5. [ ] Comparar el orden de las operaciones entre las implementaciones de arreglos y listas enlazadas.
+1. Implementar la operaciones `Union`, `Intersection`, `Difference`, `SymmetricDifference`, `Equal`, `Subset` y `Superset` para el conjunto de enteros dado como ejemplo ([`set/intset.go`](set/intset.go)).
+2. Implementar un conjunto genérico que permita almacenar cualquier tipo de dato ([`set/set.go`](set/set.go)).
+3. Implementar un conjunto basado en arreglos dinámicos (_slices_). Implementar tantos las operaciones sobre elementos como las operaciones entre conjuntos ([`set/sliceset.go`](set/sliceset.go)).
+4. Implementar un conjunto basado en listas enlazadas. Implementar tantos las operaciones sobre elementos como las operaciones entre conjuntos ([`set/listset.go`](set/listset.go)).
+5. Comparar el orden de las operaciones entre las implementaciones de arreglos y listas enlazadas.
 
 ## Diccionarios
 
