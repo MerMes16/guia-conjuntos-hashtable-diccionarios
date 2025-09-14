@@ -2,6 +2,11 @@
 // Expone la estructura Set y sus métodos para manipular un conjunto.
 package set
 
+import (
+	"fmt"
+	"strings"
+)
+
 // MapSet implementa un conjunto sobre una lista enlazada simple.
 type MapSet[T comparable] struct {
 	elements map[T]struct{}
@@ -17,8 +22,11 @@ type MapSet[T comparable] struct {
 // Parámetros:
 //   - `elements`: los elementos con los que inicializar el conjunto.
 func NewMapSet[T comparable](elements ...T) *MapSet[T] {
-	// Implementar
-	return nil
+	set := &MapSet[T]{elements: make(map[T]struct{}, len(elements))}
+	for _, v := range elements {
+		set.Add(v)
+	}
+	return set
 }
 
 // Contains verifica si el conjunto contiene el elemento especificado.
@@ -35,8 +43,8 @@ func NewMapSet[T comparable](elements ...T) *MapSet[T] {
 // Retorna:
 //   - `true` si el conjunto contiene el elemento; `false` en caso contrario.
 func (s *MapSet[T]) Contains(element T) bool {
-	// Implementar
-	return false
+	_, exist := s.elements[element]
+	return exist
 }
 
 // Add agrega los elementos especificados al conjunto.
@@ -48,7 +56,9 @@ func (s *MapSet[T]) Contains(element T) bool {
 // Parámetros:
 //   - `elements`: los elementos a agregar al conjunto.
 func (s *MapSet[T]) Add(elements ...T) {
-	// Implementar
+	for _, v := range elements {
+		s.elements[v] = struct{}{}
+	}
 }
 
 // Remove elimina el elemento especificado del conjunto.
@@ -60,7 +70,7 @@ func (s *MapSet[T]) Add(elements ...T) {
 // Parámetros:
 //   - `element`: el elemento a eliminar del conjunto.
 func (s *MapSet[T]) Remove(element T) {
-	// Implementar
+	delete(s.elements, element)
 }
 
 // Size devuelve la cantidad de elementos en el conjunto.
@@ -72,8 +82,7 @@ func (s *MapSet[T]) Remove(element T) {
 // Retorna:
 //   - la cantidad de elementos en el conjunto.
 func (s *MapSet[T]) Size() int {
-	// Implementar
-	return -1
+	return len(s.elements)
 }
 
 // Values devuelve los elementos del conjunto.
@@ -85,8 +94,11 @@ func (s *MapSet[T]) Size() int {
 // Retorna:
 //   - los elementos del conjunto como un slice.
 func (s *MapSet[T]) Values() []T {
-	// Implementar
-	return nil
+	values := make([]T, 0, len(s.elements))
+	for k := range s.elements {
+		values = append(values, k)
+	}
+	return values
 }
 
 // String devuelve una representación en cadena del conjunto.
@@ -98,6 +110,15 @@ func (s *MapSet[T]) Values() []T {
 // Retorna:
 //   - una representación en cadena del conjunto.
 func (s *MapSet[T]) String() string {
-	// Implementar
-	return ""
+	var builder strings.Builder
+	builder.WriteString("Set: {")
+	var size = s.Size()
+	for i, v := range s.Values() {
+		builder.WriteString(fmt.Sprintf("%v", v))
+		if i+1 < size {
+			builder.WriteString(", ")
+		}
+	}
+	builder.WriteRune('}')
+	return builder.String()
 }

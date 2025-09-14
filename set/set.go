@@ -1,8 +1,13 @@
 package set
 
+import (
+	"fmt"
+	"strings"
+)
+
 // Set implementa un conjunto sobre un map.
 type Set[T comparable] struct {
-	// Implementar
+	elements map[T]bool
 }
 
 // NewSet crea un nuevo conjunto vacío y lo inicializa con los elementos especificados.
@@ -15,8 +20,11 @@ type Set[T comparable] struct {
 // Parámetros:
 //   - `elements`: los elementos con los que inicializar el conjunto.
 func NewSet[T comparable](elements ...T) *Set[T] {
-	// Implementar
-	return nil
+	set := &Set[T]{elements: make(map[T]bool)}
+	for _, v := range elements {
+		set.Add(v)
+	}
+	return set
 }
 
 // Contains verifica si el conjunto contiene el elemento especificado.
@@ -33,8 +41,7 @@ func NewSet[T comparable](elements ...T) *Set[T] {
 // Retorna:
 //   - `true` si el conjunto contiene el elemento; `false` en caso contrario.
 func (s *Set[T]) Contains(element T) bool {
-	// Implementar
-	return false
+	return s.elements[element]
 }
 
 // Add agrega los elementos especificados al conjunto.
@@ -46,7 +53,9 @@ func (s *Set[T]) Contains(element T) bool {
 // Parámetros:
 //   - `elements`: los elementos a agregar al conjunto.
 func (s *Set[T]) Add(elements ...T) {
-	// Implementar
+	for _, v := range elements {
+		s.elements[v] = true
+	}
 }
 
 // Remove elimina el elemento especificado del conjunto.
@@ -58,7 +67,7 @@ func (s *Set[T]) Add(elements ...T) {
 // Parámetros:
 //   - `element`: el elemento a eliminar del conjunto.
 func (s *Set[T]) Remove(element T) {
-	// Implementar
+	delete(s.elements, element)
 }
 
 // Size devuelve la cantidad de elementos en el conjunto.
@@ -70,8 +79,7 @@ func (s *Set[T]) Remove(element T) {
 // Retorna:
 //   - la cantidad de elementos en el conjunto.
 func (s *Set[T]) Size() int {
-	// Implementar
-	return -1
+	return len(s.elements)
 }
 
 // Values devuelve los elementos del conjunto.
@@ -83,8 +91,11 @@ func (s *Set[T]) Size() int {
 // Retorna:
 //   - los elementos del conjunto como un slice.
 func (s *Set[T]) Values() []T {
-	// Implementar
-	return nil
+	values := make([]T, 0, s.Size())
+	for k := range s.elements {
+		values = append(values, k)
+	}
+	return values
 }
 
 // String devuelve una representación en cadena del conjunto.
@@ -96,6 +107,15 @@ func (s *Set[T]) Values() []T {
 // Retorna:
 //   - una representación en cadena del conjunto.
 func (s *Set[T]) String() string {
-	// Implementar
-	return ""
+	var builder strings.Builder
+	builder.WriteString("Set: {")
+	var size = s.Size()
+	for i, v := range s.Values() {
+		builder.WriteString(fmt.Sprintf("%v", v))
+		if i+1 < size {
+			builder.WriteString(", ")
+		}
+	}
+	builder.WriteRune('}')
+	return builder.String()
 }

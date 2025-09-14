@@ -2,7 +2,11 @@
 // Expone la estructura ListSet y sus métodos para manipular un conjunto.
 package set
 
-import "untref-ayp2/guia-conjuntos-hashes-diccionarios/list"
+import (
+	"fmt"
+	"strings"
+	"untref-ayp2/guia-conjuntos-hashes-diccionarios/list"
+)
 
 // ListSet implementa un conjunto sobre una lista enlazada simple.
 type ListSet[T comparable] struct {
@@ -19,8 +23,13 @@ type ListSet[T comparable] struct {
 // Parámetros:
 //   - `elements`: los elementos con los que inicializar el conjunto.
 func NewListSet[T comparable](elements ...T) *ListSet[T] {
-	// Implementar
-	return nil
+	set := &ListSet[T]{elements: list.NewLinkedList[T]()}
+	for _, v := range elements {
+		if !set.Contains(v) {
+			set.elements.Append(v)
+		}
+	}
+	return set
 }
 
 // Contains verifica si el conjunto contiene el elemento especificado.
@@ -37,7 +46,11 @@ func NewListSet[T comparable](elements ...T) *ListSet[T] {
 // Retorna:
 //   - `true` si el conjunto contiene el elemento; `false` en caso contrario.
 func (s *ListSet[T]) Contains(element T) bool {
-	// Implementar
+	for current := s.elements.Head(); current != nil; current = current.Next() {
+		if current.Data() == element {
+			return true
+		}
+	}
 	return false
 }
 
@@ -50,7 +63,11 @@ func (s *ListSet[T]) Contains(element T) bool {
 // Parámetros:
 //   - `elements`: los elementos a agregar al conjunto.
 func (s *ListSet[T]) Add(elements ...T) {
-	// Implementar
+	for _, v := range elements {
+		if !s.Contains(v) {
+			s.elements.Append(v)
+		}
+	}
 }
 
 // Remove elimina el elemento especificado del conjunto.
@@ -62,7 +79,12 @@ func (s *ListSet[T]) Add(elements ...T) {
 // Parámetros:
 //   - `element`: el elemento a eliminar del conjunto.
 func (s *ListSet[T]) Remove(element T) {
-	// Implementar
+	for current := s.elements.Head(); current != nil; current = current.Next() {
+		if current.Data() == element {
+			s.elements.Remove(current.Data())
+			return
+		}
+	}
 }
 
 // Size devuelve la cantidad de elementos en el conjunto.
@@ -74,8 +96,7 @@ func (s *ListSet[T]) Remove(element T) {
 // Retorna:
 //   - la cantidad de elementos en el conjunto.
 func (s *ListSet[T]) Size() int {
-	// Implementar
-	return -1
+	return s.elements.Size()
 }
 
 // Values devuelve los elementos del conjunto.
@@ -87,8 +108,11 @@ func (s *ListSet[T]) Size() int {
 // Retorna:
 //   - los elementos del conjunto como un slice.
 func (s *ListSet[T]) Values() []T {
-	// Implementar
-	return nil
+	values := make([]T, 0, s.Size())
+	for current := s.elements.Head(); current != nil; current = current.Next() {
+		values = append(values, current.Data())
+	}
+	return values
 }
 
 // String devuelve una representación en cadena del conjunto.
@@ -100,6 +124,15 @@ func (s *ListSet[T]) Values() []T {
 // Retorna:
 //   - una representación en cadena del conjunto.
 func (s *ListSet[T]) String() string {
-	// Implementar
-	return ""
+	var builder strings.Builder
+	builder.WriteString("Set: {")
+	var size = s.Size()
+	for i, v := range s.Values() {
+		builder.WriteString(fmt.Sprintf("%v", v))
+		if i+1 < size {
+			builder.WriteString(", ")
+		}
+	}
+	builder.WriteString("}")
+	return builder.String()
 }
