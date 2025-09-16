@@ -3,7 +3,10 @@
 // La tabla utiliza un arreglo para almacenar pares clave-valor.
 package hashtable
 
-import "fmt"
+import (
+	"fmt"
+	"hash/maphash"
+)
 
 // hashTableEntry representa una entrada en la tabla hash, que contiene una
 // clave y su valor asociado.
@@ -26,8 +29,8 @@ type HashTable[K comparable, V any] struct {
 	loadFactor float32
 	// threshold es el umbral de carga para redimensionar la tabla.
 	threshold uint
-	// hashFunc calcula el índice del bucket para una clave dada.
-	hashFunc func(key K) uint
+	// semilla crea una semilla aleatoria para el maphash
+	semilla maphash.Seed
 }
 
 // NewHashTable crea una nueva tabla de hash cerrada con la capacidad y el
@@ -40,7 +43,7 @@ type HashTable[K comparable, V any] struct {
 //
 // - Si la capacidad no es un número primo, se redimensiona a la siguiente
 // capacidad primo mayor o igual a la capacidad especificada.
-func NewHashTable[K comparable, V any](capacity uint, loadFactor float32, hashFunc func(key K) uint) *HashTable[K, V] {
+func NewHashTable[K comparable, V any](capacity uint, loadFactor float32) *HashTable[K, V] {
 	if capacity == 0 {
 		capacity = 17
 	}
@@ -56,7 +59,7 @@ func NewHashTable[K comparable, V any](capacity uint, loadFactor float32, hashFu
 		capacity:   capacity,
 		loadFactor: loadFactor,
 		threshold:  uint(float32(capacity) * loadFactor),
-		hashFunc:   hashFunc,
+		semilla:    maphash.MakeSeed(),
 	}
 }
 
@@ -79,7 +82,7 @@ func (ht *HashTable[K, V]) Put(key K, value V) bool {
 		ht.resize()
 	}
 
-	index := ht.hashFunc(key) % ht.capacity
+	index := ht.hasheada(key) % ht.capacity
 	for {
 		if ht.buckets[index] == nil || ht.buckets[index].key == zeroValue {
 			// Si el bucket está vacío o la clave es nula, insertamos el nuevo elemento.
@@ -180,6 +183,13 @@ func (ht *HashTable[K, V]) String() string {
 	return result
 }
 
+func (ht *HashTable[K, V]) hasheada(key K) uint {
+	var h maphash.Hash
+	h.SetSeed(ht.semilla)
+	_, _ = h.WriteString(fmt.Sprintf("%v", key))
+	return uint(h.Sum64())
+}
+
 // Funciones privadas //////////////////////////////////////////////////////////
 
 // getIndex devuelve el índice del bucket para una clave dada y un booleano que
@@ -189,7 +199,7 @@ func (ht *HashTable[K, V]) getIndex(key K) (uint, bool) {
 	if key == zeroKValue {
 		return 0, false
 	}
-	for index := ht.hashFunc(key) % ht.capacity; ht.buckets[index] != nil; index = (index + 1) % ht.capacity {
+	for index := ht.hasheada(key) % ht.capacity; ht.buckets[index] != nil; index = (index + 1) % ht.capacity {
 		if ht.buckets[index].key == key {
 			return index, true
 		}
@@ -209,7 +219,7 @@ func (ht *HashTable[K, V]) resize() {
 	// Reinsertar todos los elementos en el nuevo arreglo, manejando colisiones
 	for _, node := range ht.buckets {
 		if node != nil && node.key != zeroKValue {
-			index := ht.hashFunc(node.key) % newCapacity
+			index := ht.hasheada(node.key) % newCapacity
 			for newBuckets[index] != nil {
 				// Resolver colisiones con prueba lineal
 				index = (index + 1) % newCapacity

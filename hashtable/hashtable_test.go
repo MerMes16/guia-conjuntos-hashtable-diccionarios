@@ -1,26 +1,14 @@
 package hashtable
 
 import (
-	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-// hashFunc calcula el índice del bucket para una clave dada. Se utiliza la técnica de Mulitiplicación Polinómica.
-func hashFn(key string) uint {
-	const a float64 = 11.0
-	l := len(key)
-	var hash uint = 0
-	for i, c := range key {
-		hash += uint(c) * uint(math.Pow(a, float64(l-i-1)))
-	}
-	return hash
-}
-
 func TestNewHashTable(t *testing.T) {
-	ht := NewHashTable[string, int](0, 0, hashFn)
+	ht := NewHashTable[string, int](0, 0)
 	require.NotNil(t, ht)
 	assert.Equal(t, uint(17), ht.capacity)
 	assert.Equal(t, uint(0), ht.size)
@@ -29,7 +17,7 @@ func TestNewHashTable(t *testing.T) {
 }
 
 func TestHashTable(t *testing.T) {
-	ht := NewHashTable[string, int](0, 0, hashFn)
+	ht := NewHashTable[string, int](0, 0)
 	require.NotNil(t, ht)
 
 	// Verificar que la tabla está vacía
