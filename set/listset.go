@@ -136,3 +136,13 @@ func (s *ListSet[T]) String() string {
 	builder.WriteString("}")
 	return builder.String()
 }
+
+func (s *ListSet[T]) Intersection(other *ListSet[T]) *ListSet[T] {
+	newSet := NewListSet[T]()
+	for current := s.elements.Head(); current != nil; current = current.Next() {
+		if other.Contains(current.Data()) {
+			newSet.Add(current.Data())
+		}
+	}
+	return newSet
+}
