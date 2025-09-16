@@ -4,57 +4,117 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-func TestNewHashTable(t *testing.T) {
-	ht := NewHashTable[string, int](0, 0)
-	require.NotNil(t, ht)
-	assert.Equal(t, uint(17), ht.capacity)
-	assert.Equal(t, uint(0), ht.size)
-	assert.Equal(t, float32(0.75), ht.loadFactor)
-	assert.Equal(t, uint(12), ht.threshold)
+func TestPutAndGetClosed(t *testing.T) {
+	ht := NewHashTable[string, int](10, 0.75)
+
+	ht.Put("key1", 10)
+	ht.Put("key2", 20)
+
+	value, found := ht.Get("key1")
+	assert.True(t, found)
+	assert.Equal(t, 10, value)
+
+	value, found = ht.Get("key2")
+	assert.True(t, found)
+	assert.Equal(t, 20, value)
+
+	ht.Put("key1", 30)
+	value, found = ht.Get("key1")
+	assert.True(t, found)
+	assert.Equal(t, 30, value)
 }
 
-func TestHashTable(t *testing.T) {
-	ht := NewHashTable[string, int](0, 0)
-	require.NotNil(t, ht)
+func TestCollisionHandlingClosed(t *testing.T) {
+	ht := NewHashTable[string, int](5, 0.75)
 
-	// Verificar que la tabla está vacía
+	ht.Put("a", 1)
+	ht.Put("b", 2)
+	ht.Put("c", 3)
+
+	val, found := ht.Get("a")
+	assert.True(t, found)
+	assert.Equal(t, 1, val)
+
+	val, found = ht.Get("b")
+	assert.True(t, found)
+	assert.Equal(t, 2, val)
+
+	val, found = ht.Get("c")
+	assert.True(t, found)
+	assert.Equal(t, 3, val)
+}
+
+func TestRemoveClosed(t *testing.T) {
+	ht := NewHashTable[string, int](10, 0.75)
+
+	ht.Put("key1", 10)
+	ht.Put("key2", 20)
+
+	removed := ht.Remove("key1")
+	assert.True(t, removed)
+
+	_, found := ht.Get("key1")
+	assert.False(t, found)
+
+	// Debe seguir encontrando key2 aunque esté después en la secuencia
+	val, found := ht.Get("key2")
+	assert.True(t, found)
+	assert.Equal(t, 20, val)
+}
+
+func TestKeysAndValuesClosed(t *testing.T) {
+	ht := NewHashTable[string, int](10, 0.75)
+
+	ht.Put("key1", 10)
+	ht.Put("key2", 20)
+
+	keys := ht.Keys()
+	assert.ElementsMatch(t, []string{"key1", "key2"}, keys)
+
+	values := ht.Values()
+	assert.ElementsMatch(t, []int{10, 20}, values)
+}
+
+func TestResizeClosed(t *testing.T) {
+	ht := NewHashTable[string, int](2, 0.5)
+
+	ht.Put("key1", 10)
+	ht.Put("key2", 20)
+	ht.Put("key3", 30) // fuerza resize
+
+	val, found := ht.Get("key1")
+	assert.True(t, found)
+	assert.Equal(t, 10, val)
+
+	val, found = ht.Get("key2")
+	assert.True(t, found)
+	assert.Equal(t, 20, val)
+
+	val, found = ht.Get("key3")
+	assert.True(t, found)
+	assert.Equal(t, 30, val)
+}
+
+func TestClearClosed(t *testing.T) {
+	ht := NewHashTable[string, int](10, 0.75)
+
+	ht.Put("key1", 10)
+	ht.Put("key2", 20)
+	ht.Clear()
+
 	assert.Equal(t, uint(0), ht.Size())
-	assert.Equal(t, uint(17), ht.capacity)
+	assert.True(t, ht.IsEmpty())
+}
 
-	// Agregar elementos
-	ht.Put("key1", 1)
-	ht.Put("key2", 2)
-	ht.Put("key3", 3)
+func TestIsEmptyAndSizeClosed(t *testing.T) {
+	ht := NewHashTable[string, int](10, 0.75)
 
-	// Actulizar un valor existente
-	ht.Put("key2", 4)
+	assert.True(t, ht.IsEmpty())
+	assert.Equal(t, uint(0), ht.Size())
 
-	// Verificar que los elementos se han agregado correctamente
-	assert.Equal(t, uint(3), ht.size)
-	assert.Equal(t, uint(17), ht.capacity)
-
-	// Obtener valores
-	val1, found1 := ht.Get("key1")
-	assert.True(t, found1)
-	assert.Equal(t, 1, val1)
-
-	val2, found2 := ht.Get("key2")
-	assert.True(t, found2)
-	assert.Equal(t, 4, val2)
-
-	val3, found3 := ht.Get("key3")
-	assert.True(t, found3)
-	assert.Equal(t, 3, val3)
-
-	// Probar la eliminación de un elemento
-	ht.Remove("key2")
-	val2Removed, found2Removed := ht.Get("key2")
-	assert.False(t, found2Removed)
-	assert.Equal(t, 0, val2Removed)
-
-	// Verificar el tamaño después de eliminar un elemento
-	assert.Equal(t, uint(2), ht.Size())
+	ht.Put("key1", 10)
+	assert.False(t, ht.IsEmpty())
+	assert.Equal(t, uint(1), ht.Size())
 }
